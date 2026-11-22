@@ -156,31 +156,38 @@ class SolarRouterCard extends RcCard {
     const h = this._hass;
     const c = this._config;
     const list = rcMemo((this._memo ||= {}), "devices", [c.devices, h.entities], () => srDevices(h, c.devices));
+    const sun = h.states["sun.sun"];
+    const moon = sun?.state === "below_horizon";
     const devices = list.map((d) => {
       const st = h.states[d.entity];
       const offline = !st || ["unavailable", "unknown"].includes(st.state);
       const watts = srWatts(d.power ? h.states[d.power] : undefined);
       const energy = srKwh(d.energy ? h.states[d.energy] : undefined);
-      const active = !offline && (watts != null ? watts > 30 : ["on", "heat", "heating", "charging"].includes(st.state));
-      return { ...d, offline, watts, energy, active, progress: this._progress(d, st), color: SR_COLORS[d.kind] };
+      const running = !offline && (watts != null ? watts > 30 : ["on", "heat", "heating", "charging"].includes(st.state));
+      return { ...d, offline, watts, energy, running, progress: this._progress(d, st), color: SR_COLORS[d.kind] };
     });
-    const routing = devices.filter((d) => d.active).reduce((s, d) => s + (d.watts || 0), 0);
+    const runningW = devices.filter((d) => d.running).reduce((s, d) => s + (d.watts || 0), 0);
     const surplusId = c.surplus || (c.grid ? null : rcMemo(this._memo, "surplus", [h.entities], () => srSurplusSource(h)));
     let surplus = null;
     if (surplusId) surplus = srWatts(h.states[surplusId]);
     else if (c.grid) {
+      // What the devices run on, less what the home draws from the grid (or plus what it still exports).
       const g = srWatts(h.states[c.grid]);
-      if (g != null) surplus = Math.max(0, c.grid_invert ? g : -g) + routing;
+      if (g != null) surplus = Math.max(0, runningW - (c.grid_invert ? -g : g));
     }
+    // A running device is on the surplus only by day and while there is some: an EV charging at night, or while the
+    // home draws all of its power from the grid, is not routed.
+    const onSurplus = !moon && (surplus == null || surplus > 0);
+    for (const d of devices) d.active = d.running && onSurplus;
+    const routing = onSurplus ? Math.min(runningW, surplus ?? runningW) : 0;
     const energies = devices.map((d) => d.energy).filter((e) => e != null);
     const routed = c.routed ? srKwh(h.states[c.routed]) : energies.length ? energies.reduce((s, e) => s + e, 0) : null;
-    const sun = h.states["sun.sun"];
     const anyActive = devices.some((d) => d.active);
     const threshold = Number(c.threshold) || 100;
     let state;
     if (surplus == null && !devices.length) state = "none";
     else if (anyActive) state = "routing";
-    else if (sun?.state === "below_horizon") state = "night";
+    else if (moon) state = "night";
     else if ((surplus || 0) >= threshold) state = "surplus";
     else state = "waiting";
     const heater = devices.find((d) => d.kind === "water_heater" && d.progress);
@@ -196,7 +203,7 @@ class SolarRouterCard extends RcCard {
       routedId: c.routed || null,
       used: surplus ? Math.min(1, routing / surplus) : 0,
       level: heater ? heater.progress.share : null,
-      moon: sun?.state === "below_horizon",
+      moon,
     };
   }
 
@@ -263,18 +270,18 @@ class SolarRouterCard extends RcCard {
 
   // One tile per device: its icon, its name and status, its power, its progress and its energy of the day.
   _device(d) {
-    const status = d.offline ? this._t("dev_offline") : d.active ? this._t("on_surplus") : this._t("waiting");
+    const status = d.offline ? this._t("dev_offline") : d.active ? this._t("on_surplus") : d.running ? this._t("on_grid") : this._t("waiting");
     const bar = d.progress ? `<span class="pb"><span style="width:${Math.round(d.progress.share * 100)}%"></span></span>` : "";
     const foot = d.progress || d.energy != null ? `<span class="df"><span>${rcEsc(d.progress?.text || "")}</span><span>${d.energy != null ? rcEsc(this._t("kwh_today", { v: this._kwh(d.energy) })) : ""}</span></span>` : "";
-    return `<button class="dv${d.active ? " on" : ""}${d.offline ? " na" : ""}" style="--k:${d.color}" data-id="${rcEsc(d.entity)}" title="${rcEsc(`${d.name} — ${status}`)}">
-      <span class="dh"><span class="di"><ha-icon icon="${rcEsc(d.icon)}"></ha-icon></span><span class="dt"><span class="dn">${rcEsc(d.name)}</span><span class="ds">${rcEsc(status)}</span></span><span class="dw">${d.active && d.watts != null ? `${rcEsc(this._fmt(d.watts / 1000, 2))}<small> kW</small>` : "—"}</span></span>
+    return `<button class="dv${d.active ? " on" : d.running ? " grid" : ""}${d.offline ? " na" : ""}" style="--k:${d.color}" data-id="${rcEsc(d.entity)}" title="${rcEsc(`${d.name} — ${status}`)}">
+      <span class="dh"><span class="di"><ha-icon icon="${rcEsc(d.icon)}"></ha-icon></span><span class="dt"><span class="dn">${rcEsc(d.name)}</span><span class="ds">${rcEsc(status)}</span></span><span class="dw">${d.running && d.watts != null ? `${rcEsc(this._fmt(d.watts / 1000, 2))}<small> kW</small>` : "—"}</span></span>
       ${bar}${foot}</button>`;
   }
 
   _draw(m) {
     const c = this._config;
     const status = this._t(`st_${m.state === "none" ? "offline" : m.state}`);
-    const parts = [m.state, m.surplus, m.routed, m.devices.map((d) => [d.entity, d.name, d.active, d.offline, d.watts, d.energy, d.progress]), this._night(), m.moon];
+    const parts = [m.state, m.surplus, m.routed, m.devices.map((d) => [d.entity, d.name, d.active, d.running, d.offline, d.watts, d.energy, d.progress]), this._night(), m.moon];
     if (!this._changed(parts)) return;
     const sub = c.show_subtitle !== false ? this._sub(m) : "";
     const subHtml = sub ? `<div class="subt">${rcEsc(sub)}</div>` : "";
@@ -325,6 +332,7 @@ class SolarRouterCard extends RcCard {
     .dv { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px;
           background: var(--secondary-background-color, rgba(127,127,127,.08)); }
     .dv.on { box-shadow: inset 0 0 0 2px var(--k); }
+    .dv.grid { box-shadow: inset 0 0 0 2px var(--rc-idle); }
     .dv.na { opacity: .6; }
     .dv:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .dh { display: flex; align-items: center; gap: 8px; min-width: 0; }

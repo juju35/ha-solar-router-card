@@ -33,7 +33,7 @@ A Lovelace card for **solar surplus routing**: the surplus power, the devices it
 ## Features
 
 - **The surplus now and the energy routed today**, on a band that is green while there is surplus to route
-- **One tile per device**: its icon and name, *On surplus* or *Waiting for surplus*, its power while it routes, its progress (a water heater's temperature toward its target, a pool's filtration time…) and its energy of the day; the devices on the surplus are outlined in their colour
+- **One tile per device**: its icon and name, *On surplus*, *From the grid* or *Waiting for surplus*, its power while it runs, its progress (a water heater's temperature toward its target, a pool's filtration time…) and its energy of the day; the devices on the surplus are outlined in their colour
 - **Water heaters, EV chargers, pool pumps, heaters, anything else**: each kind has its icon and colour, from the entity's domain and name (or `kind`)
 - **The surplus from a sensor or from the grid meter**: a surplus sensor (a PV router's, a surplus manager's), else what the grid meter exports plus what the devices route
 - **Status**: *Routing* while a device is on the surplus, *Surplus available* above the threshold, *Waiting for surplus* under it, *Night* once the sun has set
@@ -113,7 +113,7 @@ surplus: sensor.solar_surplus
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `surplus` | string | a power sensor named *surplus* / *excess* | Both: the power available for routing (W) |
-| `grid` | string | | Both: the grid meter's power (W), negative while exporting, when there is no `surplus`: the surplus is what is exported plus what the devices route |
+| `grid` | string | | Both: the grid meter's power (W), negative while exporting, when there is no `surplus`: the surplus is what the devices run on, less what is drawn from the grid |
 | `grid_invert` | boolean | `false` | Both: the grid power is positive while exporting |
 | `routed` | string | the devices' energies added up | Both: today's routed energy (kWh) |
 | `threshold` | number | `100` | Both: below this surplus (W), there is nothing to route |
@@ -159,11 +159,11 @@ surplus: sensor.solar_surplus
 
 ## How it works
 
-- **Surplus**: `surplus`, else `grid` (exported power plus the power of the devices on the surplus), else the first power sensor named like a surplus (*surplus*, *excess*, *excédent*, *Überschuss*)
+- **Surplus**: `surplus`, else `grid` (the power of the running devices, plus what is still exported or less what is drawn from the grid), else the first power sensor named like a surplus (*surplus*, *excess*, *excédent*, *Überschuss*)
 - **Devices**: `devices`, else the switches of Solar Optimizer and PV Excess Control; each device's power and energy of the day are its `power` and `energy`, else the first power sensor and the first daily energy sensor of its registry device
-- **On surplus**: a device drawing more than 30 W, or, without a power sensor, one that is `on`, heating or charging
+- **On surplus**: a running device (drawing more than 30 W, or, without a power sensor, `on`, heating or charging) while the sun is up and there is surplus; otherwise a running device is *From the grid* (an EV charging at night) and is not routed
 - **Progress**: `progress` toward `target` (from 0, or from 15 ° for a temperature), else a water heater's temperature toward its target
-- **Routed today**: `routed`, else the devices' energies of the day added up
+- **Routed today**: `routed`, else the devices' energies of the day added up (they include what a device drew from the grid: set `routed` for the exact figure)
 - **Read only**: the card calls no action; a tap opens the entity's details
 
 ## Development

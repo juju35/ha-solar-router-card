@@ -77,6 +77,23 @@ test("surplus from the grid meter: what is exported plus what the devices route"
   assert.equal(inverted._items.surplus, 600 + 1800);
 });
 
+test("a device running without surplus is not routed: at night, or on the grid", () => {
+  const night = make("solar-router-card", BASE, makeHass({ heater: 0, ev: 7200, surplus: 0, sun: "below_horizon" }));
+  const ev = night._items.devices[1];
+  assert.deepEqual([ev.running, ev.active], [true, false], "an EV charging at night");
+  assert.equal(night._items.routing, 0);
+  assert.equal(night._items.state, "night");
+  assert.match(night.shadowRoot.innerHTML, /class="dv grid"[\s\S]*?<span class="ds">From the grid<\/span>/);
+  // From the grid meter: the home draws 5 kW of the EV's 7.2 kW, so 2.2 kW come from the panels.
+  const grid = make("solar-router-card", { grid: "sensor.grid_power", devices: DEVICES }, makeHass({ heater: 0, ev: 7200, grid: 5000 }));
+  assert.equal(grid._items.surplus, 2200);
+  assert.equal(grid._items.routing, 2200);
+  const all = make("solar-router-card", { grid: "sensor.grid_power", devices: DEVICES }, makeHass({ heater: 0, ev: 7200, grid: 7300 }));
+  assert.equal(all._items.surplus, 0, "all of it from the grid");
+  assert.equal(all._items.devices[1].active, false);
+  assert.notEqual(all._items.state, "routing");
+});
+
 test("states: surplus available, waiting, night, nothing found", () => {
   const surplus = make("solar-router-card", BASE, makeHass({ heater: 0, ev: 0 }));
   assert.equal(surplus._items.state, "surplus");
