@@ -123,8 +123,11 @@ test("mini card: the ring, the surplus and the devices on it, and the zoom to th
   const html = card.shadowRoot.innerHTML;
   assert.match(html, /<ha-card class="lvl-routing bn">/);
   assert.match(html, /class="ringb"/);
-  assert.match(html, /<button class="r g" data-id="sensor.solar_surplus" title="1\.8 kW surplus">/);
-  assert.match(html, /→ Water heater/);
+  assert.match(html, /<button class="r g" data-id="water_heater\.cumulus" title="1\.8 kW → Water heater \+1">/, "the flow fits one chip");
+  const idle = make("solar-router-mini-card", BASE, makeHass({ heater: 0, ev: 0 }));
+  assert.match(idle.shadowRoot.innerHTML, /<button class="r g" data-id="sensor\.solar_surplus" title="1\.8 kW surplus">/);
+  const none = make("solar-router-mini-card", {}, { ...makeHass(), entities: {}, states: {} });
+  assert.match(none.shadowRoot.innerHTML, /<span class="r" title="No surplus and no device found/, "nothing to open: plain text");
   card._zoomed = true;
   card._sig = null;
   card._render();

@@ -413,9 +413,13 @@ class SolarRouterCard extends RcCard {
     .banner .rs { display: flex; flex-wrap: wrap; gap: 4px; height: 20px; margin: 3px 0 0 -2px; min-width: 0; overflow: hidden; }
     .banner .r { flex: none; line-height: 20px; padding: 0 7px; color: var(--bt); background: rgba(255,255,255,.62); }
     .banner.night .r { background: rgba(10,20,40,.4); }
+    .banner span.r { cursor: default; }
+    .banner span.r:hover { background: rgba(255,255,255,.62); }
+    .banner.night span.r:hover { background: rgba(10,20,40,.4); }
     .banner .ringb { position: absolute; inset: 0; }
-    /* The surplus chip of the mini card, in green. */
-    .banner .r.g { color: #14532d; background: #d3f0da; }
+    /* The surplus or flow chip of the mini card, in green; alone on its line, it shortens the device's name rather than
+       wrap out of sight. */
+    .banner .r.g { color: #14532d; background: #d3f0da; flex: 0 1 auto; min-width: 0; }
     .banner.night .r.g { color: #b9ecc6; background: rgba(47,158,68,.3); }
   `;
 }
@@ -449,7 +453,7 @@ rcRegister(SolarRouterCard, SolarRouterCardEditor, "Solar Router Card", "Solar s
 
 // ── Mini card ────────────────────────────────────────────────────────────────
 // The router on two lines: a ring with the share of the surplus being routed as the badge, the title and the state,
-// then the surplus and the devices on it as chips; the banner's surplus runs to the devices; the zoom button opens the
+// then the power routed and the device it feeds as a chip; the banner's surplus runs to the devices; the zoom button opens the
 // full card in place.
 class SolarRouterMiniCard extends rcMini(
   SolarRouterCard,
@@ -468,10 +472,17 @@ class SolarRouterMiniCard extends rcMini(
     const on = m.devices.filter((d) => d.active);
     if (!this._changed(["mini", m.state, m.surplus, m.routing, on.map((d) => d.name), night, m.moon, m.level])) return;
     const status = this._t(`st_${m.state === "none" ? "offline" : m.state}`);
-    const chip = (text, id, cls = "") => `<button class="r${cls}"${id ? ` data-id="${rcEsc(id)}"` : ""} title="${rcEsc(text)}"><span>${rcEsc(text)}</span></button>`;
-    const chips = m.none
-      ? chip(this._t("no_router"))
-      : [m.surplus != null && chip(this._t("chip_surplus", { v: this._kw(m.surplus, 1) }), m.surplusId, " g"), ...on.map((d) => chip(`→ ${d.name}`, d.entity))].filter(Boolean).join("");
+    // A chip opens its entity's details; one with nothing to open is plain text.
+    const chip = (text, id, cls = "") =>
+      id
+        ? `<button class="r${cls}" data-id="${rcEsc(id)}" title="${rcEsc(text)}"><span>${rcEsc(text)}</span></button>`
+        : `<span class="r${cls}" title="${rcEsc(text)}"><span>${rcEsc(text)}</span></span>`;
+    // The flow in one chip, so that it always fits: the power routed → the first device on the surplus (+ the others).
+    const flow = on.length ? `${this._kw(m.routing, 1)} → ${on[0].name}${on.length > 1 ? ` +${on.length - 1}` : ""}` : "";
+    let chips = "";
+    if (m.none) chips = chip(this._t("no_router"));
+    else if (flow) chips = chip(flow, on[0].entity, " g");
+    else if (m.surplus != null) chips = chip(this._t("chip_surplus", { v: this._kw(m.surplus, 1) }), m.surplusId, " g");
     // The ring around the badge: the share of the surplus being routed.
     const L = 2 * Math.PI * 17;
     const ring = `<svg class="ringb" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="color-mix(in srgb, var(--c) 18%, transparent)" stroke-width="4"/><circle cx="20" cy="20" r="17" fill="none" stroke="var(--c)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${(L * m.used).toFixed(1)} 999" transform="rotate(-90 20 20)"/></svg>`;
