@@ -470,7 +470,8 @@ class SolarRouterMiniCard extends rcMini(
   _drawMini(m) {
     const night = this._night();
     const on = m.devices.filter((d) => d.active);
-    if (!this._changed(["mini", m.state, m.surplus, m.routing, on.map((d) => d.name), night, m.moon, m.level])) return;
+    // Rebuilt only when what it shows changes: the powers as written, not every watt.
+    if (!this._changed(["mini", m.state, this._kw(m.surplus, 1), this._kw(m.routing, 1), on.map((d) => d.name), night, m.moon, Math.round((m.level ?? 0) * 20), Math.round(m.used * 40)])) return;
     const status = this._t(`st_${m.state === "none" ? "offline" : m.state}`);
     // A chip opens its entity's details; one with nothing to open is plain text.
     const chip = (text, id, cls = "") =>
