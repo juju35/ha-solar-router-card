@@ -39,6 +39,10 @@ test("discovery: the surplus sensor by name, the devices' kinds, power and energ
   assert.equal(d[1].name, "EV charger", "the configured name wins");
   // No `devices`: the surplus managers' switches.
   assert.deepEqual(json(sr.srDevices(h).map((x) => x.entity)), ["switch.solar_optimizer_dryer"]);
+  // Solar Optimizer's enable switch beside the device's is not a second device.
+  h.entities["switch.enable_solar_optimizer_dryer"] = { device_id: "so", platform: "solar_optimizer", translation_key: "enable" };
+  h.entities["switch.solar_optimizer_heater_enable"] = { device_id: "so", platform: "solar_optimizer" };
+  assert.deepEqual(json(sr.srDevices(h).map((x) => x.entity)), ["switch.solar_optimizer_dryer"]);
   assert.equal(sr.srKind("switch.radiateur_salon"), "heater");
   assert.equal(sr.srKind("switch.dishwasher"), "other");
 });

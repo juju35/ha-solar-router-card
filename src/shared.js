@@ -438,6 +438,8 @@ const RC_I18N = {
 // `energy`), else the power and energy sensors of its device; its progress (a water heater's temperature toward its
 // target, a pool's filtration time…) is `progress` and `target`, else a water heater's own temperatures.
 const SR_PLATFORMS = ["solar_optimizer", "pv_excess_control"];
+// The managers' own switches that are not a device: Solar Optimizer's "enable" switch beside each device's.
+const SR_NOT_DEVICE = /(^switch\.enable_|_enable$|_enabled$|^enable)/;
 const SR_KINDS = {
   water_heater: /water.?heater|cumulus|chauffe.?eau|ballon|boiler|ecs|dhw/,
   ev: /\bev\b|charger|wallbox|borne|car|vehicle|voiture|zappi|easee|go.?e/,
@@ -500,7 +502,12 @@ const srSiblings = (hass, id) => {
 // switches of the surplus managers.
 const srDevices = (hass, list) => {
   const reg = hass.entities || {};
-  const items = Array.isArray(list) && list.length ? list : Object.keys(reg).filter((id) => id.startsWith("switch.") && SR_PLATFORMS.includes(reg[id].platform));
+  const items =
+    Array.isArray(list) && list.length
+      ? list
+      : Object.keys(reg).filter(
+          (id) => id.startsWith("switch.") && SR_PLATFORMS.includes(reg[id].platform) && !SR_NOT_DEVICE.test(id) && !SR_NOT_DEVICE.test(reg[id].translation_key || ""),
+        );
   return items
     .map((d) => (typeof d === "string" ? { entity: d } : d || {}))
     .filter((d) => d.entity)
