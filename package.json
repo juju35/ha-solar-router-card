@@ -1,6 +1,6 @@
 {
   "name": "ha-solar-router-card",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Lovelace card for Home Assistant solar surplus routing: the surplus, the devices it feeds and the energy routed today.",
   "repository": {
     "type": "git",
