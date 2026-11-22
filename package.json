@@ -1,0 +1,27 @@
+{
+  "name": "ha-solar-router-card",
+  "version": "1.0.0",
+  "description": "A Lovelace card for Home Assistant solar surplus routing: the surplus, the devices it feeds and the energy routed today.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juju35/ha-solar-router-card.git"
+  },
+  "bugs": {
+    "url": "https://github.com/juju35/ha-solar-router-card/issues"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs && node --check dist/ha-solar-router-card.js",
+    "test": "node --test test/*.test.mjs",
+    "screenshots": "npm run build && node scripts/screenshots/solar-router.mjs && node scripts/screenshots/animations.mjs"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@mdi/js": "^7.4.47",
+    "acorn": "^8.19.0",
+    "css-tree": "^3.2.1",
+    "playwright": "^1.64.1"
+  }
+}
