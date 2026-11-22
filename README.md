@@ -14,7 +14,7 @@
   <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/images/shelly.png" alt="Shelly" height="24">&nbsp;&nbsp;
   <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/images/esphome.png" alt="ESPHome" height="24">&nbsp;&nbsp;
   <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/images/mqtt.png" alt="MQTT" height="24">&nbsp;&nbsp;
-  <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/images/solar-optimizer.png" alt="Solar Optimizer" height="36">
+  <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/images/solar-optimizer.png" alt="Solar Optimizer" height="24">
 </p>
 
 A Lovelace card for **solar surplus routing**: the surplus power, the devices it feeds (water heater, EV charger, pool pump…) and today's energy routed to each instead of being exported.
@@ -38,7 +38,7 @@ A Lovelace card for **solar surplus routing**: the surplus power, the devices it
 - **The surplus from a sensor or from the grid meter**: a surplus sensor (a PV router's, a surplus manager's), else what the grid meter exports plus what the devices route
 - **Status**: *Routing* while a device is on the surplus, *Surplus available* above the threshold, *Waiting for surplus* under it, *Night* once the sun has set
 - **Illustrated header**: the house and its panels, a water heater whose hot water rises with its progress, an EV charger and a pool; the surplus runs from the panels to the devices while they route; the moon by night, the dark theme darkens the picture
-- **Mini card**: the share of the surplus being routed as a ring around the badge, the state, the surplus and the devices on it; its zoom button opens the full card in place
+- **Mini card**: the share of the surplus being routed as a ring around the badge, the state, then the power routed → the device it feeds (or the surplus while nothing runs); its zoom button opens the full card in place
 - **Tap a tile** to open its entity's details
 - Visual editor for both cards (the device list in YAML), light and dark themes, 22 languages, no external dependency
 
@@ -51,7 +51,7 @@ The card reads the grid and production meters, the routers and the surplus manag
 | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/images/shelly.png" alt="Shelly" height="16"> | [Shelly](https://www.home-assistant.io/integrations/shelly/) (built in) | Shelly EM / Pro 3EM grid and production meters |
 | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/images/esphome.png" alt="ESPHome" height="16"> | [ESPHome](https://www.home-assistant.io/integrations/esphome/) (built in) | Meters and DIY routers, including [Solar Router for ESPHome](https://github.com/XavierBerger/Solar-Router-for-ESPHome) |
 | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/images/mqtt.png" alt="MQTT" height="16"> | [MQTT](https://www.home-assistant.io/integrations/mqtt/) (built in) | MK2PVRouter, MSunPV and F1ATB routers |
-| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/images/solar-optimizer.png" alt="Solar Optimizer" height="24"> | [Solar Optimizer](https://github.com/jmcollin78/solar_optimizer) (Marketplace) | Managed devices, their state and power |
+| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/images/solar-optimizer.png" alt="Solar Optimizer" height="16"> | [Solar Optimizer](https://github.com/jmcollin78/solar_optimizer) (Marketplace) | Managed devices, their state and power |
 |  | [PV Excess Control](https://github.com/InventoCasa/PV-Excess-Control) (Marketplace) | Appliances switched on the solar excess |
 
 ## Installation
@@ -152,10 +152,11 @@ surplus: sensor.solar_surplus
 ## How it works
 
 - **Surplus**: `surplus`, else `grid` (the power of the running devices, plus what is still exported or less what is drawn from the grid), else the first power sensor named like a surplus (*surplus*, *excess*, *excédent*, *Überschuss*)
-- **Devices**: `devices`, else the switches of Solar Optimizer and PV Excess Control; each device's power and energy of the day are its `power` and `energy`, else the first power sensor and the first daily energy sensor of its registry device
+- **Devices**: `devices`, else the switches of Solar Optimizer and PV Excess Control (not Solar Optimizer's *enable* switches); each device's power and energy of the day are its `power` and `energy`, else the first power sensor and the first daily energy sensor of its registry device
 - **On surplus**: a running device (drawing more than 30 W, or, without a power sensor, `on`, heating or charging) while the sun is up and there is surplus; otherwise a running device is *From the grid* (an EV charging at night) and is not routed
 - **Progress**: `progress` toward `target` (from 0, or from 15 ° for a temperature), else a water heater's temperature toward its target
 - **Routed today**: `routed`, else the devices' energies of the day added up (they include what a device drew from the grid: set `routed` for the exact figure)
+- **Refresh**: live, at each state change of the sensors and switches; nothing is fetched
 - **Read only**: the card calls no action; a tap opens the entity's details
 
 ## Development
