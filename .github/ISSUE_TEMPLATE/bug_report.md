@@ -24,7 +24,7 @@ If applicable, add screenshots to help explain your problem.
 **Environment:**
 - Home Assistant version:
 - Browser:
-- HACS version:
+- Marketplace version:
 - Card version:
 - Card (solar-router-card or solar-router-mini-card):
 - Router or surplus manager (Solar Optimizer, PV Excess Control, ESPHome, MQTT…):
