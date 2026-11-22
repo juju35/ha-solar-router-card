@@ -28,7 +28,7 @@ A Lovelace card for **solar surplus routing**: the surplus power, the devices it
 
 | Routing | Mini card |
 |---|---|
-| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-routing.png" alt="Routing" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-routing.png" alt="Mini card" width="320"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-routing.gif" alt="Routing" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-routing.gif" alt="Mini card" width="320"> |
 
 ## Features
 
@@ -132,30 +132,22 @@ surplus: sensor.solar_surplus
 
 | Routing | Surplus available | Waiting for surplus |
 |---|---|---|
-| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-routing.png" alt="Routing" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-surplus.png" alt="Surplus available" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-waiting.png" alt="Waiting for surplus" width="400"> |
-| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-routing-dark.png" alt="Routing, dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-surplus-dark.png" alt="Surplus available, dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-waiting-dark.png" alt="Waiting for surplus, dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-routing.gif" alt="Routing" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-surplus.png" alt="Surplus available" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-waiting.png" alt="Waiting for surplus" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-routing-dark.gif" alt="Routing, dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-surplus-dark.png" alt="Surplus available, dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-waiting-dark.png" alt="Waiting for surplus, dark" width="400"> |
 
 | Night | Narrow |
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-night.png" alt="Night" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-narrow.png" alt="Narrow" width="300"> |
 | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-night-dark.png" alt="Night, dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-narrow-dark.png" alt="Narrow, dark" width="300"> |
 
-**Routing animation**: the surplus runs as a dashed line from the panels to the devices while they route (still with `animations: false`, or when the system asks for reduced motion).
-
-| Light | Dark |
-|---|---|
-| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-routing.gif" alt="Routing animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-routing-dark.gif" alt="Routing animation, dark" width="400"> |
+**Routing** is animated: the surplus runs as a dashed line from the panels to the devices while they route (still with `animations: false`, or when the system asks for reduced motion).
 
 ### Solar router mini
 
 | Routing | Night | Zoomed in |
 |---|---|---|
-| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-routing.png" alt="Mini, routing" width="320"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-night.png" alt="Mini, night" width="320"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-zoom.png" alt="Mini, zoomed in" width="400"> |
-| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-routing-dark.png" alt="Mini, routing, dark" width="320"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-night-dark.png" alt="Mini, night, dark" width="320"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-zoom-dark.png" alt="Mini, zoomed in, dark" width="400"> |
-
-| Routing animation | Dark |
-|---|---|
-| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-routing.gif" alt="Mini, routing animation" width="320"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-routing-dark.gif" alt="Mini, routing animation, dark" width="320"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-routing.gif" alt="Mini, routing" width="320"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-night.png" alt="Mini, night" width="320"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-zoom.png" alt="Mini, zoomed in" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-routing-dark.gif" alt="Mini, routing, dark" width="320"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-night-dark.png" alt="Mini, night, dark" width="320"> | <img src="https://raw.githubusercontent.com/juju35/ha-solar-router-card/main/screenshots/sr-mini-zoom-dark.png" alt="Mini, zoomed in, dark" width="400"> |
 
 ## How it works
 
